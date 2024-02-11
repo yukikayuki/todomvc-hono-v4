@@ -5,22 +5,20 @@ export default function Main({ todos: initialTodos }: { todos: Todo[] }) {
   const [todos, setTodos] = useState(initialTodos)
 
   const deleteTodo = async (id: string) => {
-    const res = await fetch('/todos', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id }),
-    })
+    const res = await fetch(`/todos/${id}`, { method: 'DELETE' })
 
     if (res.status === 200) {
       setTodos(todos.filter((t) => t.id !== id))
+    } else {
+      alert(`ERROR: HTTP Status is ${res.status}`)
     }
   }
 
   const putTodo = async (todo: Todo) => {
-    const res = await fetch('/todos', {
+    const res = await fetch(`/todos/${todo.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: todo.id, title: todo.title, completed: todo.completed }),
+      body: JSON.stringify({ title: todo.title, completed: todo.completed }),
     })
 
     if (res.status === 200) {
@@ -36,6 +34,8 @@ export default function Main({ todos: initialTodos }: { todos: Todo[] }) {
         return t
       })
       setTodos(newTodos)
+    } else {
+      alert(`ERROR: HTTP Status is ${res.status}`)
     }
   }
 

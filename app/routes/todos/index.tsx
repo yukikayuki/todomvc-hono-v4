@@ -9,17 +9,3 @@ export const POST = createRoute(async (c) => {
 
   return c.redirect('/')
 })
-
-export const PUT = createRoute(async (c) => {
-  const json = await c.req.json()
-  await editTodo(json.id, json.title, json.completed)
-
-  return c.json({ status: 'ok' })
-})
-
-export const DELETE = createRoute(async (c) => {
-  const json = await c.req.json()
-  await deleteTodo(json.id)
-
-  return c.json({ status: 'ok' })
-})
