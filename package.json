@@ -1,5 +1,5 @@
 {
-  "name": "basic",
+  "name": "todomvc-hono-v4",
   "type": "module",
   "scripts": {
     "dev": "vite",
