@@ -14,8 +14,14 @@
   },
   "devDependencies": {
     "@hono/vite-cloudflare-pages": "^0.2.4",
+    "prettier": "^3.2.5",
     "vite": "^5.0.12",
     "wrangler": "^3.27.0"
   },
-  "packageManager": "yarn@4.0.2"
+  "prettier": {
+    "semi": false,
+    "tabWidth": 2,
+    "printWidth": 120,
+    "singleQuote": true
+  }
 }
