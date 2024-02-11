@@ -10,7 +10,8 @@
   "private": true,
   "dependencies": {
     "hono": "^4.0.1",
-    "honox": "^0.1.0"
+    "honox": "^0.1.0",
+    "todomvc-app-css": "^2.4.3"
   },
   "devDependencies": {
     "@hono/vite-cloudflare-pages": "^0.2.4",
