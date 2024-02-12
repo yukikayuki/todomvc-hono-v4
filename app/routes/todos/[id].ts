@@ -1,17 +1,49 @@
 import { createRoute } from 'honox/factory'
-import { deleteTodo, editTodo } from '../../store'
+import invariant from 'tiny-invariant'
+import { addTodo, clearCompleted, deleteTodo, editTodo, getTodo, toggleAll } from '../../store'
 
-export const PUT = createRoute(async (c) => {
+export const POST = createRoute(async (c) => {
   const { id } = c.req.param()
-  const json = await c.req.json()
-  await editTodo(id, json.title, json.completed)
+  const formData = await c.req.formData()
+  const _action = formData.get('_action')
+  invariant(_action)
+  console.info({ _action })
 
-  return c.json({ status: 'ok' })
-})
+  if (_action === 'new-todo') {
+    const newTitle = formData.get('new-title')
+    await addTodo(newTitle as string)
+  }
 
-export const DELETE = createRoute(async (c) => {
-  const { id } = c.req.param()
-  await deleteTodo(id)
+  if (_action === 'toggle-all') {
+    await toggleAll()
+  }
 
-  return c.json({ status: 'ok' })
+  if (_action === 'toggle-completed') {
+    const completed = formData.get('completed')
+
+    const todo = await getTodo(id)
+    invariant(todo)
+
+    await editTodo(id!, todo.title, completed === 'on')
+  }
+
+  if (_action === 'edit-title') {
+    const newTitle = formData.get('new-title')
+    invariant(newTitle)
+
+    const todo = await getTodo(id)
+    invariant(todo)
+
+    await editTodo(id!, newTitle as string, todo.completed)
+  }
+
+  if (_action === 'delete-todo') {
+    await deleteTodo(id)
+  }
+
+  if (_action === 'clear-completed') {
+    await clearCompleted()
+  }
+
+  return c.redirect('/')
 })
