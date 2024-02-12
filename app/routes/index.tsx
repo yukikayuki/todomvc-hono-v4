@@ -59,7 +59,6 @@ const Footer = ({ todos, searchParams }: { todos: Todo[]; searchParams: URLSearc
   const activeTodos = todos.filter((t) => !t.completed)
 
   const filter = searchParams.get('filter')
-  console.log(searchParams.toString())
 
   return (
     <footer class={'footer'}>
