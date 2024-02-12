@@ -1,9 +1,11 @@
 import { createRoute } from 'honox/factory'
 import invariant from 'tiny-invariant'
 import { addTodo, clearCompleted, deleteTodo, editTodo, getTodo, toggleAll } from '../../store'
+import { buildUrl } from '../../utils/buildUrl'
 
 export const POST = createRoute(async (c) => {
   const { id } = c.req.param()
+  const searchParams = new URLSearchParams(new URL(c.req.url).search)
   const formData = await c.req.formData()
   const _action = formData.get('_action')
   invariant(_action)
@@ -45,5 +47,5 @@ export const POST = createRoute(async (c) => {
     await clearCompleted()
   }
 
-  return c.redirect('/')
+  return c.redirect(buildUrl('/', searchParams))
 })

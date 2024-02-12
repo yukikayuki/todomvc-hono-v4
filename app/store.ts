@@ -10,7 +10,7 @@ const setStore = async (todos: Todo[]) => {
   store = todos
 }
 
-export const getTodos = async (filter?: string | undefined) => {
+export const getTodos = async (filter?: string | null) => {
   if (filter === 'active') {
     return store.filter((t) => !t.completed)
   }

@@ -1,8 +1,16 @@
 import { Todo } from '../../store'
-import { useState } from 'hono/jsx'
+import { useEffect, useState } from 'hono/jsx'
+import { buildUrl } from '../../utils/buildUrl'
 
 export default function Item({ todo }: { todo: Todo }) {
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null)
   const [isWritable, setIsWritable] = useState(false)
+
+  useEffect(() => {
+    // ここはwindowの世界
+    const params = new URLSearchParams(window.location.search)
+    setSearchParams(params)
+  }, [])
 
   const idForToggleForm = `form-toggle-${todo.id}`
   const idForNewTitleInput = `input-new-title-${todo.id}`
@@ -11,7 +19,7 @@ export default function Item({ todo }: { todo: Todo }) {
     <li class={todo.completed ? 'completed' : ''}>
       <div class={'view'}>
         {isWritable && (
-          <form method={'post'} action={`/todos/${todo.id}`}>
+          <form method={'post'} action={buildUrl(`/todos/${todo.id}`, searchParams)}>
             <input type={'hidden'} name={'_action'} value={'edit-title'} />
             <input
               id={idForNewTitleInput}
@@ -26,7 +34,7 @@ export default function Item({ todo }: { todo: Todo }) {
         )}
         {!isWritable && (
           <>
-            <form id={idForToggleForm} method={'post'} action={`/todos/${todo.id}`}>
+            <form id={idForToggleForm} method={'post'} action={buildUrl(`/todos/${todo.id}`, searchParams)}>
               <input type={'hidden'} name={'_action'} value={'toggle-completed'} />
             </form>
             <input
@@ -53,7 +61,7 @@ export default function Item({ todo }: { todo: Todo }) {
             >
               {todo.title}
             </label>
-            <form method={'post'} action={`/todos/${todo.id}`}>
+            <form method={'post'} action={buildUrl(`/todos/${todo.id}`, searchParams)}>
               <input type={'hidden'} name={'_action'} value={'delete-todo'} />
               <button class={'destroy'} type={'submit'} />
             </form>

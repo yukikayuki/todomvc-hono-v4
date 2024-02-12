@@ -1,30 +1,31 @@
 import { createRoute } from 'honox/factory'
 import { getTodos, Todo } from '../store'
 import Item from '../islands/todo/item'
+import { buildUrl } from '../utils/buildUrl'
 
 export default createRoute(async (c) => {
-  const filter = c.req.query('filter')
+  const searchParams = new URLSearchParams(new URL(c.req.url).search)
 
-  const todos = await getTodos(filter)
+  const todos = await getTodos(searchParams.get('filter'))
 
-  return c.render(<App todos={todos} filter={filter} />, { title: 'Todos' })
+  return c.render(<App todos={todos} searchParams={searchParams} />, { title: 'Todos' })
 })
 
-const App = async ({ todos, filter }: { todos: Todo[]; filter: string | undefined }) => {
+const App = async ({ todos, searchParams }: { todos: Todo[]; searchParams: URLSearchParams }) => {
   return (
     <div class={'todoapp'}>
-      <Header />
-      <Main todos={todos} />
-      <Footer todos={todos} filter={filter} />
+      <Header searchParams={searchParams} />
+      <Main todos={todos} searchParams={searchParams} />
+      <Footer todos={todos} searchParams={searchParams} />
     </div>
   )
 }
 
-const Header = () => {
+const Header = ({ searchParams }: { searchParams: URLSearchParams }) => {
   return (
     <header class={'header'}>
       <h1>todos</h1>
-      <form class={'input-container'} method={'post'} action={'/todos/new'}>
+      <form class={'input-container'} method={'post'} action={buildUrl('/todos/new', searchParams)}>
         <input type={'hidden'} name={'_action'} value={'new-todo'} />
         <input name={'new-title'} class={'new-todo'} type={'text'} autofocus placeholder={'What needs to be done?'} />
       </form>
@@ -32,11 +33,11 @@ const Header = () => {
   )
 }
 
-const Main = ({ todos }: { todos: Todo[] }) => {
+const Main = ({ todos, searchParams }: { todos: Todo[]; searchParams: URLSearchParams }) => {
   return (
     <main class={'main'}>
       <div class={'toggle-all-container'}>
-        <form method={'post'} action={`/todos/all`}>
+        <form method={'post'} action={buildUrl('/todos/all', searchParams)}>
           <input type={'hidden'} name={'_action'} value={'toggle-all'} />
           <input id={'toggle-all'} class={'toggle-all'} type={'submit'} />
           <label class={'toggle-all-label'} for={'toggle-all'}>
@@ -54,8 +55,11 @@ const Main = ({ todos }: { todos: Todo[] }) => {
   )
 }
 
-const Footer = ({ todos, filter }: { todos: Todo[]; filter: string | undefined }) => {
+const Footer = ({ todos, searchParams }: { todos: Todo[]; searchParams: URLSearchParams }) => {
   const activeTodos = todos.filter((t) => !t.completed)
+
+  const filter = searchParams.get('filter')
+  console.log(searchParams.toString())
 
   return (
     <footer class={'footer'}>
@@ -81,7 +85,7 @@ const Footer = ({ todos, filter }: { todos: Todo[]; filter: string | undefined }
         </li>
       </ul>
 
-      <form method={'post'} action={'/todos/all'}>
+      <form method={'post'} action={buildUrl('/todos/all', searchParams)}>
         <input type={'hidden'} name={'_action'} value={'clear-completed'} />
         <button class="clear-completed" type={'submit'}>
           Clear completed
