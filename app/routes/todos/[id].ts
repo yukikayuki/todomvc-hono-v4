@@ -29,16 +29,6 @@ export const POST = createRoute(async (c) => {
     await editTodo(id!, todo.title, completed === 'on')
   }
 
-  if (_action === 'edit-title') {
-    const newTitle = formData.get('new-title')
-    invariant(newTitle)
-
-    const todo = await getTodo(id)
-    invariant(todo)
-
-    await editTodo(id!, newTitle as string, todo.completed)
-  }
-
   if (_action === 'delete-todo') {
     await deleteTodo(id)
   }
@@ -48,4 +38,24 @@ export const POST = createRoute(async (c) => {
   }
 
   return c.redirect(buildUrl('/', searchParams))
+})
+
+export const PUT = createRoute(async (c) => {
+  const { id } = c.req.param()
+  const json = await c.req.json()
+  const { _action } = json
+  invariant(_action)
+  console.info(_action)
+
+  if (_action === 'edit-title') {
+    const { newTitle } = json
+    invariant(newTitle)
+
+    const todo = await getTodo(id)
+    invariant(todo)
+
+    await editTodo(id!, newTitle as string, todo.completed)
+  }
+
+  return c.json({ status: 'ok' })
 })
