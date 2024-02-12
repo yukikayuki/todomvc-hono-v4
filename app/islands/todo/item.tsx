@@ -3,6 +3,9 @@ import { useEffect, useState } from 'hono/jsx'
 import { buildUrl } from '../../utils/buildUrl'
 
 export default function Item({ todo }: { todo: Todo }) {
+  const idForToggleForm = `form-toggle-${todo.id}`
+  const idForNewTitleInput = `input-new-title-${todo.id}`
+
   const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null)
   const [isWritable, setIsWritable] = useState(false)
   const [todoTitle, setTodoTitle] = useState(todo.title)
@@ -12,6 +15,15 @@ export default function Item({ todo }: { todo: Todo }) {
     const params = new URLSearchParams(window.location.search)
     setSearchParams(params)
   }, [])
+
+  useEffect(() => {
+    if (isWritable) {
+      // タイトル編集inputのフォーカス and キャレットを最後の文字の後ろにする
+      const el = document.getElementById(idForNewTitleInput) as HTMLInputElement | null
+      el?.focus()
+      el?.setSelectionRange(todoTitle.length, todoTitle.length)
+    }
+  }, [isWritable])
 
   const updateTodoTitle = async (ev: Event) => {
     ev.preventDefault()
@@ -33,9 +45,6 @@ export default function Item({ todo }: { todo: Todo }) {
       alert(`ERROR: HTTP Status is ${res.status}`)
     }
   }
-
-  const idForToggleForm = `form-toggle-${todo.id}`
-  const idForNewTitleInput = `input-new-title-${todo.id}`
 
   return (
     <li class={todo.completed ? 'completed' : ''}>
@@ -68,20 +77,7 @@ export default function Item({ todo }: { todo: Todo }) {
                 ;(document.getElementById(idForToggleForm) as HTMLFormElement).submit()
               }}
             />
-            <label
-              onDoubleClick={() => {
-                setIsWritable(true)
-                setTimeout(() => {
-                  // タイトル編集inputのフォーカス and キャレットを最後の文字の後ろにする
-                  const el = document.getElementById(idForNewTitleInput) as HTMLInputElement | null
-                  const value = el?.value ?? ''
-                  el?.focus()
-                  el?.setSelectionRange(value.length, value.length)
-                }, 100)
-              }}
-            >
-              {todoTitle}
-            </label>
+            <label onDoubleClick={() => setIsWritable(true)}>{todoTitle}</label>
             <form method={'post'} action={buildUrl(`/todos/${todo.id}`, searchParams)}>
               <input type={'hidden'} name={'_action'} value={'delete-todo'} />
               <button class={'destroy'} type={'submit'} />
